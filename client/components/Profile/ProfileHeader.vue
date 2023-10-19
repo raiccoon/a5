@@ -22,7 +22,6 @@ async function getProfile() {
 onBeforeMount(async () => {
   await getProfile();
   loaded.value = true;
-  console.log(name);
 });
 </script>
 
