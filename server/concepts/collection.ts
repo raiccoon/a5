@@ -81,7 +81,6 @@ export default class CollectionConcept {
 
   private async isLabelUnique(user: ObjectId, label: string) {
     if (await this.collections.readOne({ owner: user, label: label })) {
-      console.log(await this.collections.readOne({ owner: user, label: label }));
       throw new NotAllowedError(`Collection named ${label} owned by ${user} already exists!`);
     }
   }

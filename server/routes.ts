@@ -73,7 +73,7 @@ class Routes {
     const user = WebSession.getUser(session);
     const postVisibility = await Promise.all(posts.map(async (post) => await ExclusiveContentPost.isVisible(user, post._id)));
     const visiblePosts = posts.filter((post, i) => postVisibility[i]);
-    return { msg: "Posts retreived!", posts: await Responses.posts(visiblePosts) };
+    return await Responses.posts(visiblePosts);
   }
 
   @Router.get("/posts?authorsIn=[author_collection]")
@@ -305,18 +305,18 @@ class Routes {
     }
   }
 
-  @Router.patch("/profiles/:_id/name")
-  async updateProfileName(session: WebSessionDoc, _id: ObjectId, name: string) {
+  @Router.patch("/profiles/name")
+  async updateProfileName(session: WebSessionDoc, name: string) {
     const user = WebSession.getUser(session);
-    await Profile.isUser(user, new ObjectId(_id));
-    return await Profile.editName(new ObjectId(_id), name);
+    const profile = await Profile.getByUser(user);
+    return await Profile.editName(profile.profile!._id, name);
   }
 
-  @Router.patch("/profiles/:_id/bio")
-  async updateProfileBio(session: WebSessionDoc, _id: ObjectId, bio: string) {
+  @Router.patch("/profiles/bio")
+  async updateProfileBio(session: WebSessionDoc, bio: string) {
     const user = WebSession.getUser(session);
-    await Profile.isUser(user, new ObjectId(_id));
-    return await Profile.editBio(new ObjectId(_id), bio);
+    const profile = await Profile.getByUser(user);
+    return await Profile.editBio(profile.profile!._id, bio);
   }
 }
 
