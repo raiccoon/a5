@@ -6,6 +6,7 @@ import { NotAllowedError, NotFoundError } from "./errors";
 export interface ProfileDoc extends BaseDoc {
   user: ObjectId;
   name: string;
+  avatar: string;
   bio: string;
 }
 
@@ -13,7 +14,7 @@ export default class ProfileConcept {
   public readonly profiles = new DocCollection<ProfileDoc>("profiles");
 
   async create(user: ObjectId) {
-    const _id = await this.profiles.createOne({ user, name: "", bio: "" });
+    const _id = await this.profiles.createOne({ user, name: "", avatar: "", bio: "" });
     return { msg: "Profile created successfully!", profile: await this.profiles.readOne({ _id }) };
   }
 
@@ -24,6 +25,11 @@ export default class ProfileConcept {
   async editName(_id: ObjectId, name: string) {
     await this.profiles.updateOne({ _id }, { name: name });
     return { msg: "Profile name successfully updated!" };
+  }
+
+  async editAvatar(_id: ObjectId, url: string) {
+    await this.profiles.updateOne({ _id }, { avatar: url });
+    return { msg: "Profile avatar successfully updated!" };
   }
 
   async editBio(_id: ObjectId, bio: string) {

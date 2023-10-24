@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import UserAvatar from "@/components/UserAvatar.vue";
 import { fetchy } from "@/utils/fetchy";
 import { onBeforeMount, ref } from "vue";
 
@@ -6,6 +7,7 @@ const props = defineProps(["username"]);
 
 const loaded = ref(false);
 let name = ref("");
+let avatar = ref("");
 let bio = ref("");
 
 async function getProfile() {
@@ -16,6 +18,7 @@ async function getProfile() {
     return;
   }
   name.value = profileResults.profile.name;
+  avatar.value = profileResults.profile.avatar;
   bio.value = profileResults.profile.bio;
 }
 
@@ -26,6 +29,22 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <h1>{{ name }} @{{ props.username }}</h1>
-  <p>{{ bio }}</p>
+  <section class="header">
+    <section id="avatar">
+      <UserAvatar :img="avatar" width="100" />
+    </section>
+    <section>
+      <h1>{{ name }} @{{ props.username }}</h1>
+      <p>{{ bio }}</p>
+    </section>
+  </section>
 </template>
+
+<style>
+.header {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 1em;
+}
+</style>
