@@ -14,17 +14,19 @@ async function getPosts(collection: string) {
   } catch (_) {
     return;
   }
+
   posts.value = collectionResults.posts;
+  console.log(posts.value);
 }
 
 onBeforeMount(async () => {
-  await getPosts(props.collection._id);
+  await getPosts(props.collection);
   loaded.value = true;
 });
 </script>
 
 <template>
-  <section class="collections" v-if="loaded && posts.length !== 0">
+  <section class="posts" v-if="loaded && posts.length !== 0">
     <h2>{{ collection.name }}</h2>
     <article v-for="post in posts" :key="post._id">
       <PostComponent :post="post" />

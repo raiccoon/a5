@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import router from "@/router";
 import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
 const content = ref("");
-const emit = defineEmits(["refreshPosts"]);
 
 const createPost = async (content: string) => {
   try {
@@ -13,7 +13,7 @@ const createPost = async (content: string) => {
   } catch (_) {
     return;
   }
-  emit("refreshPosts");
+  void router.push({ name: "Home" });
   emptyForm();
 };
 
@@ -23,6 +23,7 @@ const emptyForm = () => {
 </script>
 
 <template>
+  <h2>Create a post:</h2>
   <form @submit.prevent="createPost(content)">
     <label for="content">Post Contents:</label>
     <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>

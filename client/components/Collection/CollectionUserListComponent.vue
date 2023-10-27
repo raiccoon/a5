@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UserItemComponent from "@/components/Collection/UserItemComponent.vue";
+import MiniProfileComponent from "@/components/Profile/MiniProfileComponent.vue";
 import { fetchy } from "@/utils/fetchy";
 import { onBeforeMount, ref } from "vue";
 
@@ -14,20 +14,20 @@ async function getUsers(collection: string) {
   } catch (_) {
     return;
   }
-  users.value = collectionResults.users;
+  users.value = collectionResults;
 }
 
 onBeforeMount(async () => {
-  await getUsers(props.collection._id);
+  await getUsers(props.collection);
   loaded.value = true;
 });
 </script>
 
 <template>
-  <section class="collections" v-if="loaded && users.length !== 0">
+  <section class="users" v-if="loaded && users.length !== 0">
     <h2>{{ collection.name }}</h2>
     <article v-for="user in users" :key="user._id">
-      <UserItemComponent :user="user" />
+      <MiniProfileComponent :username="user.username" />
     </article>
   </section>
 </template>
