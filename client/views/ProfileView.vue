@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CollectionListComponent from "@/components/Collection/CollectionListComponent.vue";
 import PostListComponent from "@/components/Post/PostListComponent.vue";
 import ProfileHeader from "@/components/Profile/ProfileHeader.vue";
 
@@ -12,5 +13,7 @@ const { currentUsername } = storeToRefs(useUserStore());
   <main class="column">
     <ProfileHeader :username="currentUsername" />
     <PostListComponent :own="true" />
+    <CollectionListComponent :isPostCollection="true" :owner="currentUsername" />
+    <CollectionListComponent :isPostCollection="false" :owner="currentUsername" />
   </main>
 </template>
