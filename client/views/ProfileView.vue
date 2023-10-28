@@ -3,7 +3,7 @@ import ProfileComponent from "@/components/Profile/ProfileComponent.vue";
 </script>
 
 <template>
-  <main class="column">
+  <main>
     <ProfileComponent :username="$route.query.username" />
   </main>
 </template>

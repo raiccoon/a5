@@ -25,10 +25,8 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <main class="column">
-    <ProfileHeader :username="profileUserName" />
-    <PostListComponent :profileAuthor="profileUserName" />
-    <CollectionListComponent type="post" :owner="profileUserName" />
-    <CollectionListComponent type="user" :owner="profileUserName" />
-  </main>
+  <ProfileHeader :username="profileUserName" />
+  <PostListComponent :profileAuthor="profileUserName" />
+  <CollectionListComponent type="post" :owner="profileUserName" />
+  <CollectionListComponent type="user" :owner="profileUserName" />
 </template>

@@ -83,7 +83,5 @@ article {
 .row {
   display: flex;
   justify-content: space-between;
-  margin: 0 auto;
-  max-width: 60em;
 }
 </style>

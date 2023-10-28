@@ -40,11 +40,14 @@ onBeforeMount(async () => {
   </section>
 </template>
 
-<style>
+<style scoped>
 .header {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
-  padding: 1em;
+  align-items: center;
+  gap: 1em;
+  margin: 0 auto;
+  max-width: 60em;
+  padding-top: 1em;
 }
 </style>

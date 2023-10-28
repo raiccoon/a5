@@ -63,6 +63,7 @@ menu {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1em;
 }
 
 .base article:only-child {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import UserAvatar from "@/components/UserAvatar.vue";
+import router from "@/router";
 import { fetchy } from "@/utils/fetchy";
 import { onBeforeMount, ref } from "vue";
 
@@ -22,6 +23,10 @@ async function getProfile() {
   bio.value = profileResults.profile.bio;
 }
 
+async function viewUser() {
+  void router.push({ name: "Profile", query: { username: props.username } });
+}
+
 onBeforeMount(async () => {
   await getProfile();
   loaded.value = true;
@@ -35,6 +40,7 @@ onBeforeMount(async () => {
     </section>
     <section>
       <h2>{{ name }} @{{ props.username }}</h2>
+      <button class="pure-button pure-button-primary" @click="viewUser()">View User</button>
     </section>
   </section>
 </template>
@@ -43,6 +49,7 @@ onBeforeMount(async () => {
 .profile {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  gap: 1em;
+  align-items: center;
 }
 </style>

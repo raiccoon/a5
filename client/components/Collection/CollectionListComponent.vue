@@ -50,6 +50,9 @@ onBeforeMount(async () => {
 <style scoped>
 .collections {
   padding: 1em;
+  margin: 0 auto;
+  margin: 0 auto;
+  max-width: 60em;
 }
 
 article {

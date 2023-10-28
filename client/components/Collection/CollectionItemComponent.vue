@@ -15,6 +15,9 @@ async function viewCollection(type: string, collectionId: string) {
 </template>
 
 <style scoped>
+p {
+  margin: 0em;
+}
 .owner {
   font-weight: bold;
   font-size: 1.2em;

@@ -12,6 +12,5 @@ const props = defineProps(["img"]);
 <style>
 img {
   border-radius: 50%;
-  padding: 1em;
 }
 </style>
