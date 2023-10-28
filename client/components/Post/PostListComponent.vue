@@ -3,11 +3,13 @@ import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
 import { fetchy } from "@/utils/fetchy";
 import { onBeforeMount, ref } from "vue";
+import AddToCollectionForm from "./AddToCollectionForm.vue";
 import SearchPostForm from "./SearchPostForm.vue";
 
 const loaded = ref(false);
 let posts = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
+let adding = ref("");
 let searchAuthor = ref("");
 const props = defineProps(["profileAuthor"]);
 
@@ -27,6 +29,11 @@ function updateEditing(id: string) {
   editing.value = id;
 }
 
+function updateAdding(id: string) {
+  adding.value = id;
+}
+// TODO: follow pattern of editing for adding
+
 onBeforeMount(async () => {
   if (props.profileAuthor) {
     await getPosts(props.profileAuthor);
@@ -45,7 +52,8 @@ onBeforeMount(async () => {
   </div>
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">
-      <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
+      <PostComponent v-if="editing !== post._id && adding !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" @addPostToCollection="updateAdding" />
+      <AddToCollectionForm v-else-if="adding === post._id" :post="post" @addPostToCollection="updateAdding" />
       <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
     </article>
   </section>

@@ -37,6 +37,9 @@ onBeforeMount(async () => {
 <style scoped>
 section {
   padding: 1em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 
 article {

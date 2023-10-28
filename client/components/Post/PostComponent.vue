@@ -5,7 +5,7 @@ import { storeToRefs } from "pinia";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["post"]);
-const emit = defineEmits(["editPost", "refreshPosts"]);
+const emit = defineEmits(["editPost", "refreshPosts", "addPostToCollection"]);
 const { currentUsername } = storeToRefs(useUserStore());
 
 const deletePost = async () => {
@@ -22,9 +22,10 @@ const deletePost = async () => {
   <p class="author">{{ props.post.author }}</p>
   <p>{{ props.post.content }}</p>
   <div class="base">
-    <menu v-if="props.post.author == currentUsername">
-      <li><button class="btn-small pure-button" @click="emit('editPost', props.post._id)">Edit</button></li>
-      <li><button class="button-error btn-small pure-button" @click="deletePost">Delete</button></li>
+    <menu>
+      <li><button class="btn-small pure-button" v-if="props.post.author == currentUsername" @click="emit('editPost', props.post._id)">Edit</button></li>
+      <li><button class="button-error btn-small pure-button" v-if="props.post.author == currentUsername" @click="deletePost">Delete</button></li>
+      <li><button class="btn-small pure-button" @click="emit('addPostToCollection', props.post._id)">Add To Collection</button></li>
     </menu>
     <article class="timestamp">
       <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>
