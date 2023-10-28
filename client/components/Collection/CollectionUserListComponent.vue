@@ -30,10 +30,11 @@ onBeforeMount(async () => {
       <MiniProfileComponent :username="user.username" />
     </article>
   </section>
+  <section v-else-if="loaded">No users in collection</section>
 </template>
 
 <style scoped>
-.users {
+section {
   padding: 1em;
 }
 

@@ -48,6 +48,6 @@ onBeforeMount(async () => {
   gap: 1em;
   margin: 0 auto;
   max-width: 60em;
-  padding-top: 1em;
+  padding: 1em 0 1em;
 }
 </style>

@@ -27,15 +27,15 @@ onBeforeMount(async () => {
 
 <template>
   <section class="posts" v-if="loaded && posts.length !== 0">
-    <h2>{{ collection.name }}</h2>
     <article v-for="post in posts" :key="post._id">
       <PostComponent :post="post" />
     </article>
   </section>
+  <section v-else-if="loaded">No posts in collection</section>
 </template>
 
 <style scoped>
-.posts {
+section {
   padding: 1em;
 }
 

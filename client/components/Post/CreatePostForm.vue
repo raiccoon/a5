@@ -13,7 +13,7 @@ const createPost = async (content: string) => {
   } catch (_) {
     return;
   }
-  void router.push({ name: "Home" });
+  void router.push({ name: "Profile" });
   emptyForm();
 };
 
@@ -27,7 +27,7 @@ const emptyForm = () => {
   <form @submit.prevent="createPost(content)">
     <label for="content">Post Contents:</label>
     <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>
-    <button type="submit" class="pure-button-primary pure-button">Create Post</button>
+    <button type="submit" class="pure-button-primary pure-button">New Post</button>
   </form>
 </template>
 

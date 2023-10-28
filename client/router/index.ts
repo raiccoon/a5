@@ -5,6 +5,7 @@ import { useUserStore } from "@/stores/user";
 import CollectionView from "../views/CollectionView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
+import NewCollectionView from "../views/NewCollectionView.vue";
 import NewPostView from "../views/NewPostView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import ProfileView from "../views/ProfileView.vue";
@@ -32,9 +33,15 @@ const router = createRouter({
       props: true,
     },
     {
-      path: "/post",
-      name: "Create Post",
+      path: "/new_post",
+      name: "New Post",
       component: NewPostView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/new_collection",
+      name: "New Collection",
+      component: NewCollectionView,
       meta: { requiresAuth: true },
     },
     {

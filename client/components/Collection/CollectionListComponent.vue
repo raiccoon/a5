@@ -45,6 +45,7 @@ onBeforeMount(async () => {
       <CollectionItemComponent :type="props.type" :collection="collection" />
     </article>
   </section>
+  <p v-else-if="loaded">No collections found</p>
 </template>
 
 <style scoped>
@@ -53,6 +54,9 @@ onBeforeMount(async () => {
   margin: 0 auto;
   margin: 0 auto;
   max-width: 60em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 }
 
 article {
