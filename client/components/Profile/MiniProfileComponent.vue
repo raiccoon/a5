@@ -11,6 +11,8 @@ let name = ref("");
 let avatar = ref("");
 let bio = ref("");
 
+// TODO: Show all users / make a user search, and add "add to collection" to main profile
+
 async function getProfile() {
   let profileResults;
   try {
@@ -38,8 +40,8 @@ onBeforeMount(async () => {
     <section id="avatar">
       <UserAvatar :img="avatar" width="70" />
     </section>
-    <section>
-      <h2>{{ name }} @{{ props.username }}</h2>
+    <section id="info">
+      <p class="user">{{ name }} @{{ props.username }}</p>
       <button class="pure-button pure-button-primary" @click="viewUser()">View User</button>
     </section>
   </section>
@@ -51,5 +53,10 @@ onBeforeMount(async () => {
   flex-direction: row;
   gap: 1em;
   align-items: center;
+}
+.user {
+  font-weight: bold;
+  font-size: 1.2em;
+  padding-bottom: 1em;
 }
 </style>

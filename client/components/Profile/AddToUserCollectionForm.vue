@@ -4,18 +4,18 @@ import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
-const props = defineProps(["post"]);
+const props = defineProps(["username"]);
 const collection = ref("");
 let collections = ref<Array<Record<string, string>>>([]);
-const emit = defineEmits(["addPostToCollection", "refreshPosts"]);
+const emit = defineEmits(["addUserToCollection"]);
 
 const { currentUsername } = storeToRefs(useUserStore());
 
-async function getPostCollections() {
-  // TODO: Filter out collections that already contain post
+async function getUserCollections() {
+  // TODO: Filter out collections that already contain user
   let collectionResults;
   try {
-    collectionResults = await fetchy(`api/post_collections/${currentUsername.value}`, "GET");
+    collectionResults = await fetchy(`api/user_collections/${currentUsername.value}`, "GET");
   } catch (_) {
     return;
   }
@@ -24,22 +24,19 @@ async function getPostCollections() {
 
 const addToCollection = async (collection: string) => {
   try {
-    await fetchy(`/api/post_collections/${collection}/posts`, "POST", { body: { post: props.post._id } });
+    await fetchy(`/api/user_collections/${collection}/users`, "POST", { body: { username: props.username } });
   } catch (e) {
     return;
   }
-  emit("addPostToCollection");
-  emit("refreshPosts");
+  emit("addUserToCollection");
 };
 
 onBeforeMount(async () => {
-  await getPostCollections();
+  await getUserCollections();
 });
 </script>
 
 <template>
-  <p class="author">{{ props.post.author }}</p>
-  <p>{{ props.post.content }}</p>
   <form @submit.prevent="addToCollection(collection)">
     <select id="collection" v-model="collection">
       <option disabled value="">Add to collection:</option>
@@ -55,44 +52,7 @@ form {
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-}
-
-textarea {
-  font-family: inherit;
-  font-size: inherit;
-  height: 6em;
-  border-radius: 4px;
-  resize: none;
-}
-
-p {
-  margin: 0em;
-}
-
-.author {
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
-menu {
-  list-style-type: none;
-  display: flex;
-  flex-direction: row;
-  gap: 1em;
-  padding: 0;
-  margin: 0;
-}
-
-.base {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.timestamp {
-  display: flex;
-  justify-content: flex-end;
-  font-size: 0.9em;
-  font-style: italic;
+  max-width: 60em;
+  margin: 0 auto;
 }
 </style>

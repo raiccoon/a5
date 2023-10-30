@@ -38,22 +38,27 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <section class="collections" v-if="loaded && collections.length !== 0">
+  <section class="row">
     <h2 v-if="props.type == 'post'">Post Collections:</h2>
     <h2 v-else-if="props.type == 'user'">User Collections:</h2>
+  </section>
+  <section class="collections" v-if="loaded && collections.length !== 0">
     <article v-for="collection in collections" :key="collection._id">
       <CollectionItemComponent :type="props.type" :collection="collection" />
     </article>
   </section>
-  <p v-else-if="loaded">No collections found</p>
+  <p class="row" v-else-if="loaded">No collections found</p>
 </template>
 
 <style scoped>
-.collections {
-  padding: 1em;
-  margin: 0 auto;
+.collections,
+.row {
   margin: 0 auto;
   max-width: 60em;
+}
+
+.collections {
+  padding: 1em;
   display: flex;
   flex-direction: column;
   gap: 1em;

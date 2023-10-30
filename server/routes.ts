@@ -198,9 +198,10 @@ class Routes {
   }
 
   @Router.post("/user_collections/:collection/users")
-  async addToUserCollection(session: WebSessionDoc, collection: ObjectId, user: ObjectId, note: string) {
+  async addToUserCollection(session: WebSessionDoc, collection: ObjectId, username: string, note: string) {
     const currentUser = WebSession.getUser(session);
-    return await CollectionUser.labelResource(currentUser, new ObjectId(collection), new ObjectId(user), note);
+    const userId = (await User.getUserByUsername(username))._id;
+    return await CollectionUser.labelResource(currentUser, new ObjectId(collection), userId, note);
   }
 
   @Router.get("/user_collections/:collection/users")

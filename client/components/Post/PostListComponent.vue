@@ -32,7 +32,6 @@ function updateEditing(id: string) {
 function updateAdding(id: string) {
   adding.value = id;
 }
-// TODO: follow pattern of editing for adding
 
 onBeforeMount(async () => {
   if (props.profileAuthor) {
