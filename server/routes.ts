@@ -96,9 +96,9 @@ class Routes {
   }
 
   @Router.post("/posts")
-  async createPost(session: WebSessionDoc, content: string, isPublic: boolean, viewerCollections?: ObjectId[], options?: PostOptions) {
+  async createPost(session: WebSessionDoc, content: string, isPublic: boolean, viewerCollections?: ObjectId[], image?: string, options?: PostOptions) {
     const user = WebSession.getUser(session);
-    const created = await Post.create(user, content, options);
+    const created = await Post.create(user, content, image, options);
     await Visibility.setVisibility(created.post!._id, user, isPublic, viewerCollections);
     return { msg: created.msg, post: await Responses.post(created.post) };
   }

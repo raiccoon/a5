@@ -21,6 +21,7 @@ const deletePost = async () => {
 <template>
   <p class="author">{{ props.post.author }}</p>
   <p>{{ props.post.content }}</p>
+  <img class="postImg" v-if="props.post.image && $props.post.image != ''" :src="props.post.image" />
   <div class="base">
     <menu>
       <li><button class="btn-small pure-button" @click="emit('addPostToCollection', props.post._id)">Add To Collection</button></li>
@@ -69,5 +70,9 @@ menu {
 
 .base article:only-child {
   margin-left: auto;
+}
+
+.postImg {
+  border-radius: 0;
 }
 </style>

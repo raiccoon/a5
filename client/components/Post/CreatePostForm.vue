@@ -8,6 +8,7 @@ import { fetchy } from "../../utils/fetchy";
 const { currentUsername } = storeToRefs(useUserStore());
 
 const content = ref("");
+const image = ref("");
 const selectedCollections = ref<Array<string>>([]);
 let collections = ref<Array<Record<string, string>>>([]);
 const makePublic = ref(true);
@@ -15,7 +16,7 @@ const makePublic = ref(true);
 const createPost = async (content: string) => {
   try {
     await fetchy("/api/posts", "POST", {
-      body: { content, isPublic: makePublic.value, viewerCollections: selectedCollections.value },
+      body: { content, isPublic: makePublic.value, viewerCollections: selectedCollections.value, image: image.value },
     });
   } catch (_) {
     return;
@@ -48,6 +49,8 @@ onBeforeMount(async () => {
   <form @submit.prevent="createPost(content)">
     <label for="content">Post Contents:</label>
     <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>
+
+    <textarea id="image" v-model="image" placeholder="Add an image URL if you'd like!"> </textarea>
 
     <section class="makePublic">
       <label for="makePublic">Make public?</label>
