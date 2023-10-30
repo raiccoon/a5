@@ -1,16 +1,22 @@
 <script setup lang="ts">
 import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
+import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
+import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import AddToCollectionForm from "./AddToCollectionForm.vue";
 import SearchPostForm from "./SearchPostForm.vue";
+
+const { currentUsername } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
 let posts = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
 let adding = ref("");
 let searchAuthor = ref("");
+let searchAuthorCollection = ref("");
+let collections = ref<Array<Record<string, string>>>([]);
 const props = defineProps(["profileAuthor"]);
 
 async function getPosts(author?: string) {
@@ -22,7 +28,32 @@ async function getPosts(author?: string) {
     return;
   }
   searchAuthor.value = author ? author : "";
+  searchAuthorCollection.value = "";
   posts.value = postResults;
+}
+
+async function getPostsByAuthorCollection(collection: string) {
+  let postResults;
+  try {
+    postResults = await fetchy("/api/posts/byAuthor", "GET", { query: { author_collection: collection } });
+    console.log("filtered");
+  } catch (_) {
+    return;
+  }
+  searchAuthor.value = "";
+  searchAuthorCollection.value = collection;
+  posts.value = postResults;
+  console.log("filtered by collection");
+}
+
+async function getUserCollections() {
+  let collectionResults;
+  try {
+    collectionResults = await fetchy(`api/user_collections/${currentUsername.value}`, "GET");
+  } catch (_) {
+    return;
+  }
+  collections.value = collectionResults.collections;
 }
 
 function updateEditing(id: string) {
@@ -39,6 +70,7 @@ onBeforeMount(async () => {
   } else {
     await getPosts();
   }
+  await getUserCollections();
   loaded.value = true;
 });
 </script>
@@ -47,7 +79,7 @@ onBeforeMount(async () => {
   <div class="row">
     <h2 v-if="!searchAuthor">Posts:</h2>
     <h2 v-else>Posts by {{ searchAuthor }}:</h2>
-    <SearchPostForm v-if="!props.profileAuthor" @getPostsByAuthor="getPosts" />
+    <SearchPostForm v-if="loaded && !props.profileAuthor" :collections="collections" @getPostsByAuthor="getPosts" @getPostsByAuthorCollection="getPostsByAuthorCollection" />
   </div>
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">

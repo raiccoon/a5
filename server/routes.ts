@@ -71,22 +71,19 @@ class Routes {
     }
     // filter for posts that user is allowed to see
     const user = WebSession.getUser(session);
-    console.log("checking post visibility...");
     const postVisibility = await getVisibility(
       posts.map((post) => post._id),
       user,
     );
-    console.log(postVisibility);
     const visiblePosts = posts.filter((post, i) => postVisibility[i]);
-    console.log(visiblePosts);
     return await Responses.posts(visiblePosts);
   }
 
-  @Router.get("/posts?authorsIn=[author_collection]")
+  @Router.get("/posts/byAuthor")
   async getPostsByAuthorCollection(session: WebSessionDoc, author_collection: ObjectId) {
     // get posts
     const authors = await CollectionUser.getResourcesInCollection(new ObjectId(author_collection));
-    const posts = await Post.getPosts({ author: { $in: authors.resources.map((author) => new ObjectId(author._id)) } });
+    const posts = await Post.getPosts({ author: { $in: authors.resources.map((labelledAuthor) => new ObjectId(labelledAuthor.resource)) } });
 
     // filter for posts that user is allowed to see
     const user = WebSession.getUser(session);
@@ -95,7 +92,7 @@ class Routes {
       user,
     );
     const visiblePosts = posts.filter((post, i) => postVisibility[i]);
-    return { msg: "Posts retreived!", posts: await Responses.posts(visiblePosts) };
+    return await Responses.posts(visiblePosts);
   }
 
   @Router.post("/posts")
