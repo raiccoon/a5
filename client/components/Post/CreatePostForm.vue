@@ -1,14 +1,21 @@
 <script setup lang="ts">
 import router from "@/router";
-import { ref } from "vue";
+import { useUserStore } from "@/stores/user";
+import { storeToRefs } from "pinia";
+import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
+const { currentUsername } = storeToRefs(useUserStore());
+
 const content = ref("");
+const selectedCollections = ref<Array<string>>([]);
+let collections = ref<Array<Record<string, string>>>([]);
+const makePublic = ref(true);
 
 const createPost = async (content: string) => {
   try {
     await fetchy("/api/posts", "POST", {
-      body: { content },
+      body: { content, isPublic: makePublic.value, viewerCollections: selectedCollections.value },
     });
   } catch (_) {
     return;
@@ -20,6 +27,20 @@ const createPost = async (content: string) => {
 const emptyForm = () => {
   content.value = "";
 };
+
+async function getUserCollections() {
+  let collectionResults;
+  try {
+    collectionResults = await fetchy(`api/user_collections/${currentUsername.value}`, "GET");
+  } catch (_) {
+    return;
+  }
+  collections.value = collectionResults.collections;
+}
+
+onBeforeMount(async () => {
+  await getUserCollections();
+});
 </script>
 
 <template>
@@ -27,6 +48,17 @@ const emptyForm = () => {
   <form @submit.prevent="createPost(content)">
     <label for="content">Post Contents:</label>
     <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>
+
+    <section class="makePublic">
+      <label for="makePublic">Make public?</label>
+      <input type="checkbox" id="makePublic" v-model="makePublic" />
+    </section>
+
+    <select v-if="!makePublic" id="collection" v-model="selectedCollections" multiple>
+      <option disabled value="">Add to collection:</option>
+      <option v-for="collection in collections" :key="collection._id" :value="collection._id">{{ collection.label }}</option>
+    </select>
+
     <button type="submit" class="pure-button-primary pure-button">New Post</button>
   </form>
 </template>
@@ -48,5 +80,13 @@ textarea {
   padding: 0.5em;
   border-radius: 4px;
   resize: none;
+}
+
+.makePublic {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 0 auto;
+  width: 100%;
 }
 </style>

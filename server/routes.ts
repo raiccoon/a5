@@ -2,7 +2,7 @@ import { ObjectId } from "mongodb";
 
 import { Router, getExpressRouter } from "./framework/router";
 
-import { CollectionPost, CollectionUser, ExclusiveContentCollectionPost, ExclusiveContentCollectionUser, ExclusiveContentPost, Friend, Post, Profile, User, WebSession } from "./app";
+import { CollectionPost, CollectionUser, Friend, Post, Profile, User, Visibility, WebSession } from "./app";
 import { PostDoc, PostOptions } from "./concepts/post";
 import { UserDoc } from "./concepts/user";
 import { WebSessionDoc } from "./concepts/websession";
@@ -26,10 +26,10 @@ class Routes {
   }
 
   @Router.post("/users")
-  async createUser(session: WebSessionDoc, username: string, password: string) {
+  async createUser(session: WebSessionDoc, username: string, password: string, name: string, bio: string, avatar: string) {
     WebSession.isLoggedOut(session);
     const createdUser = await User.create(username, password);
-    const createdProfile = await Profile.create(createdUser.user!._id);
+    const createdProfile = await Profile.create(createdUser.user!._id, name, bio, avatar);
     return { msg: createdUser.msg, user: createdUser.user, profile: createdProfile.profile };
   }
 
@@ -71,8 +71,14 @@ class Routes {
     }
     // filter for posts that user is allowed to see
     const user = WebSession.getUser(session);
-    const postVisibility = await Promise.all(posts.map(async (post) => await ExclusiveContentPost.isVisible(user, post._id)));
+    console.log("checking post visibility...");
+    const postVisibility = await getVisibility(
+      posts.map((post) => post._id),
+      user,
+    );
+    console.log(postVisibility);
     const visiblePosts = posts.filter((post, i) => postVisibility[i]);
+    console.log(visiblePosts);
     return await Responses.posts(visiblePosts);
   }
 
@@ -84,16 +90,19 @@ class Routes {
 
     // filter for posts that user is allowed to see
     const user = WebSession.getUser(session);
-    const postVisibility = await Promise.all(posts.map(async (post) => await ExclusiveContentPost.isVisible(user, post._id)));
+    const postVisibility = await getVisibility(
+      posts.map((post) => post._id),
+      user,
+    );
     const visiblePosts = posts.filter((post, i) => postVisibility[i]);
     return { msg: "Posts retreived!", posts: await Responses.posts(visiblePosts) };
   }
 
   @Router.post("/posts")
-  async createPost(session: WebSessionDoc, content: string, options?: PostOptions) {
+  async createPost(session: WebSessionDoc, content: string, isPublic: boolean, viewerCollections?: ObjectId[], options?: PostOptions) {
     const user = WebSession.getUser(session);
     const created = await Post.create(user, content, options);
-    await ExclusiveContentPost.makeVisible(user, created.post!._id);
+    await Visibility.setVisibility(created.post!._id, user, isPublic, viewerCollections);
     return { msg: created.msg, post: await Responses.post(created.post) };
   }
 
@@ -111,23 +120,11 @@ class Routes {
     return Post.delete(_id);
   }
 
-  // POSTS - EXCLUSIVECONTENTS
-  @Router.post("/exclusives/posts/:post?viewer=[viewer]")
-  async makePostVisibleOne(session: WebSessionDoc, viewer: ObjectId, post: ObjectId) {
+  @Router.post("/posts/:_id/visibility")
+  async setPostVisiblity(session: WebSessionDoc, post: ObjectId, isPublic: boolean, viewerCollections?: ObjectId[]) {
     const user = WebSession.getUser(session);
     await Post.isAuthor(user, post);
-    return ExclusiveContentPost.makeVisible(new ObjectId(viewer), new ObjectId(post));
-  }
-
-  @Router.post("/exclusives/posts/:post?viewer_collection=[viewerCollection]")
-  async makePostVisibleCollection(session: WebSessionDoc, viewerCollection: ObjectId, post: ObjectId) {
-    const user = WebSession.getUser(session);
-    await Post.isAuthor(user, post);
-    const viewers = await CollectionUser.getResourcesInCollection(new ObjectId(viewerCollection));
-    return ExclusiveContentPost.makeVisibleToMany(
-      viewers.resources.map((user) => user._id),
-      new ObjectId(post),
-    );
+    return Visibility.setVisibility(post, user, isPublic, viewerCollections);
   }
 
   @Router.get("/friends")
@@ -179,10 +176,10 @@ class Routes {
 
   // COLLECTIONS - USERS
   @Router.post("/user_collections")
-  async createUserCollection(session: WebSessionDoc, label: string) {
+  async createUserCollection(session: WebSessionDoc, label: string, isPublic: boolean, viewerCollections?: ObjectId[]) {
     const user = WebSession.getUser(session);
     const created = await CollectionUser.create(user, label);
-    await ExclusiveContentCollectionUser.makeVisible(user, created.collection!._id);
+    await Visibility.setVisibility(created.collection!._id, user, isPublic, viewerCollections);
     return { msg: created.msg, collection: await Responses.collection(created.collection) };
   }
 
@@ -192,8 +189,11 @@ class Routes {
     const userId = (await User.getUserByUsername(username))._id;
     const resp = await CollectionUser.getCollectionsByOwner(userId);
     // fitler for visible collections
-    const collectionVisibility = await Promise.all(resp.collections.map(async (c) => await ExclusiveContentCollectionUser.isVisible(currentUser, c._id)));
-    const visibleCollections = resp.collections.filter((post, i) => collectionVisibility[i]);
+    const collectionVisibility = await getVisibility(
+      resp.collections.map((c) => c._id),
+      currentUser,
+    );
+    const visibleCollections = resp.collections.filter((collection, i) => collectionVisibility[i]);
     return { msg: resp.msg, collections: await Responses.collections(visibleCollections) };
   }
 
@@ -217,31 +217,19 @@ class Routes {
     return { msg: resp.msg, collections: await Responses.collections(resp.collections) };
   }
 
-  // COLLECTIONS - USERS - EXCLUSIVECONTENTS
-  @Router.post("/exclusives/user_collections/:collection?viewer=[viewer]")
-  async makeCollectionUserVisibleOne(session: WebSessionDoc, viewer: ObjectId, collection: ObjectId) {
+  @Router.post("/user_collections/:collection/visibility")
+  async setUserCollectionVisiblity(session: WebSessionDoc, collection: ObjectId, isPublic: boolean, viewerCollections?: ObjectId[]) {
     const user = WebSession.getUser(session);
     await CollectionUser.isOwner(user, new ObjectId(collection));
-    return ExclusiveContentCollectionUser.makeVisible(new ObjectId(viewer), new ObjectId(collection));
-  }
-
-  @Router.post("/exclusives/user_collections/:collection?viewer_collection=[viewerCollection]")
-  async makeCollectionUserVisibleCollection(session: WebSessionDoc, viewerCollection: ObjectId, collection: ObjectId) {
-    const user = WebSession.getUser(session);
-    await CollectionUser.isOwner(user, new ObjectId(collection));
-    const viewers = await CollectionUser.getResourcesInCollection(new ObjectId(viewerCollection));
-    return ExclusiveContentCollectionUser.makeVisibleToMany(
-      viewers.resources.map((user) => user._id),
-      new ObjectId(collection),
-    );
+    return Visibility.setVisibility(collection, user, isPublic, viewerCollections);
   }
 
   // COLLECTIONS - POSTS
   @Router.post("/post_collections")
-  async createPostCollection(session: WebSessionDoc, label: string) {
+  async createPostCollection(session: WebSessionDoc, label: string, isPublic: boolean, viewerCollections?: ObjectId[]) {
     const user = WebSession.getUser(session);
     const created = await CollectionPost.create(user, label);
-    await ExclusiveContentCollectionPost.makeVisible(user, created.collection!._id);
+    await Visibility.setVisibility(created.collection!._id, user, isPublic, viewerCollections);
     return { msg: created.msg, collection: await Responses.collection(created.collection) };
   }
 
@@ -251,8 +239,11 @@ class Routes {
     const userId = (await User.getUserByUsername(username))._id;
     const resp = await CollectionPost.getCollectionsByOwner(userId);
     // filter for visible collections
-    const collectionVisibility = await Promise.all(resp.collections.map(async (c) => await ExclusiveContentCollectionPost.isVisible(currentUser, c._id)));
-    const visibleCollections = resp.collections.filter((post, i) => collectionVisibility[i]);
+    const collectionVisibility = await getVisibility(
+      resp.collections.map((c) => c._id),
+      currentUser,
+    );
+    const visibleCollections = resp.collections.filter((collection, i) => collectionVisibility[i]);
     return { msg: resp.msg, collections: await Responses.collections(visibleCollections) };
   }
 
@@ -275,23 +266,12 @@ class Routes {
     return { msg: resp.msg, collections: await Responses.collections(resp.collections) };
   }
 
-  // COLLECTIONS - POSTS - EXCLUSIVECONTENTS
-  @Router.post("/exclusives/post_collections/:collection?viewer=[viewer]")
-  async makeCollectionPostVisibleOne(session: WebSessionDoc, viewer: ObjectId, collection: ObjectId) {
+  // COLLECTIONS - POSTS - VISIBILITY
+  @Router.post("/user_collections/:collection/visibility")
+  async setPostCollectionVisiblity(session: WebSessionDoc, collection: ObjectId, isPublic: boolean, viewerCollections?: ObjectId[]) {
     const user = WebSession.getUser(session);
     await CollectionPost.isOwner(user, new ObjectId(collection));
-    return ExclusiveContentCollectionPost.makeVisible(new ObjectId(viewer), new ObjectId(collection));
-  }
-
-  @Router.post("/exclusives/post_collections/:collection?viewer_collection=[viewerCollection]")
-  async makeCollectionPostVisibleCollection(session: WebSessionDoc, viewerCollection: ObjectId, collection: ObjectId) {
-    const user = WebSession.getUser(session);
-    await CollectionPost.isOwner(user, new ObjectId(collection));
-    const viewers = await CollectionUser.getResourcesInCollection(new ObjectId(viewerCollection));
-    return ExclusiveContentCollectionPost.makeVisibleToMany(
-      viewers.resources.map((user) => user._id),
-      new ObjectId(collection),
-    );
+    return Visibility.setVisibility(collection, user, isPublic, viewerCollections);
   }
 
   // PROFILES
@@ -319,6 +299,25 @@ class Routes {
     const profile = await Profile.getByUser(user);
     return await Profile.editBio(profile.profile!._id, bio);
   }
+
+  @Router.patch("/profiles/avatar")
+  async updateProfileAvatar(session: WebSessionDoc, avatar: string) {
+    const user = WebSession.getUser(session);
+    const profile = await Profile.getByUser(user);
+    return await Profile.editAvatar(profile.profile!._id, avatar);
+  }
+}
+
+async function getVisibility(resources: ObjectId[], viewer: ObjectId) {
+  return await Promise.all(
+    resources.map(async (resourceId) => {
+      const viewByDefault = await Visibility.viewByDefault(viewer, resourceId);
+      if (viewByDefault) return viewByDefault;
+
+      const viewerCollections = await Visibility.getVisibleTo(resourceId);
+      return CollectionUser.isResourceInCollections(viewer, viewerCollections);
+    }),
+  );
 }
 
 export default getExpressRouter(new Routes());

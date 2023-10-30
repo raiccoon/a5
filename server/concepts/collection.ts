@@ -54,6 +54,11 @@ export default class CollectionConcept {
     return { msg: "Associated collections retrieved!", collections };
   }
 
+  async isResourceInCollections(resource: ObjectId, collections: ObjectId[]) {
+    const labelled = await this.labelledResources.readOne({ collection: { $in: collections.map((objectId) => new ObjectId(objectId)) }, resource });
+    return labelled != undefined;
+  }
+
   // Helpers
   private async collectionExists(_id: ObjectId) {
     const maybeCollection = this.collections.readOne({ _id });
@@ -70,6 +75,14 @@ export default class CollectionConcept {
     if (maybeCollection.owner.toString() !== user.toString()) {
       throw new NotAllowedError("{0} is not the owner of and can't edit collection {1}", user, collection);
     }
+  }
+
+  async isOwnerBool(user: ObjectId, collection: ObjectId) {
+    const maybeCollection = await this.collections.readOne({ _id: collection });
+    if (!maybeCollection) {
+      throw new NotFoundError(`Collection ${collection} does not exist!`);
+    }
+    return maybeCollection.owner.toString() !== user.toString();
   }
 
   private async isNotInCollection(resource: ObjectId, collection: ObjectId) {

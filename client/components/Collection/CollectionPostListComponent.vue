@@ -14,9 +14,7 @@ async function getPosts(collection: string) {
   } catch (_) {
     return;
   }
-
   posts.value = collectionResults.posts;
-  console.log(posts.value);
 }
 
 onBeforeMount(async () => {

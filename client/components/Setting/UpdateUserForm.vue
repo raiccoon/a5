@@ -6,6 +6,7 @@ import { ref } from "vue";
 let username = ref("");
 let name = ref("");
 let bio = ref("");
+let avatar = ref("");
 let password = ref("");
 
 const { updateUser, updateSession } = useUserStore();
@@ -32,6 +33,15 @@ async function updateBio() {
     return;
   }
   bio.value = "";
+}
+
+async function updateAvatar() {
+  try {
+    await fetchy(`/api/profiles/avatar`, "PATCH", { body: { avatar: avatar.value } });
+  } catch (e) {
+    return;
+  }
+  avatar.value = "";
 }
 
 async function updatePassword() {
@@ -64,6 +74,14 @@ async function updatePassword() {
       <legend>Change your bio</legend>
       <input type="text" placeholder="New bio" v-model="bio" required />
       <button type="submit" class="pure-button pure-button-primary">Update bio</button>
+    </fieldset>
+  </form>
+
+  <form @submit.prevent="updateAvatar" class="pure-form">
+    <fieldset>
+      <legend>Change your avatar</legend>
+      <input type="text" placeholder="New link to avatar image" v-model="avatar" required />
+      <button type="submit" class="pure-button pure-button-primary">Update avatar</button>
     </fieldset>
   </form>
 

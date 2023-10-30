@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UserAvatar from "@/components/UserAvatar.vue";
+import UserAvatar from "@/components/Profile/UserAvatar.vue";
 import { fetchy } from "@/utils/fetchy";
 import { onBeforeMount, ref } from "vue";
 

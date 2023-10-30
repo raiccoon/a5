@@ -53,6 +53,14 @@ export default class PostConcept {
     }
   }
 
+  async isAuthorBool(user: ObjectId, _id: ObjectId) {
+    const post = await this.posts.readOne({ _id });
+    if (!post) {
+      throw new NotFoundError(`Post ${_id} does not exist!`);
+    }
+    return post.author.toString() === user.toString();
+  }
+
   private sanitizeUpdate(update: Partial<PostDoc>) {
     // Make sure the update cannot change the author.
     const allowedUpdates = ["content", "options"];

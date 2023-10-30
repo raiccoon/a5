@@ -13,8 +13,8 @@ export interface ProfileDoc extends BaseDoc {
 export default class ProfileConcept {
   public readonly profiles = new DocCollection<ProfileDoc>("profiles");
 
-  async create(user: ObjectId) {
-    const _id = await this.profiles.createOne({ user, name: "", avatar: "", bio: "" });
+  async create(user: ObjectId, name: string, avatar: string, bio: string) {
+    const _id = await this.profiles.createOne({ user, name, avatar, bio });
     return { msg: "Profile created successfully!", profile: await this.profiles.readOne({ _id }) };
   }
 

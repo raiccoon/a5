@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UserAvatar from "@/components/UserAvatar.vue";
+import UserAvatar from "@/components/Profile/UserAvatar.vue";
 import router from "@/router";
 import { fetchy } from "@/utils/fetchy";
 import { onBeforeMount, ref } from "vue";
@@ -38,7 +38,7 @@ onBeforeMount(async () => {
 <template>
   <section class="profile">
     <section id="avatar">
-      <UserAvatar :img="avatar" width="70" />
+      <UserAvatar :img="avatar" width="70" height="70" />
     </section>
     <section id="info">
       <p class="user">{{ name }} @{{ props.username }}</p>
