@@ -11,7 +11,7 @@ async function viewCollection(type: string, collectionId: string) {
 <template>
   <p class="owner">{{ props.collection.owner }}</p>
   <p>{{ props.collection.label }}</p>
-  <button class="pure-button pure-button-primary" @click="viewCollection(props.type, props.collection._id)">View Collection</button>
+  <button class="button-yellow" @click="viewCollection(props.type, props.collection._id)">View Collection</button>
 </template>
 
 <style scoped>

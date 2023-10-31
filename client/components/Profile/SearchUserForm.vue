@@ -10,7 +10,7 @@ const emit = defineEmits(["getUserByUsername"]);
     <fieldset>
       <legend>Search for Users</legend>
       <input id="user" type="text" v-model="user" placeholder="Username" />
-      <button type="submit" class="pure-button pure-button-primary">Search</button>
+      <button type="submit" class="button-yellow">Search</button>
     </fieldset>
   </form>
 </template>

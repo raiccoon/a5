@@ -44,7 +44,7 @@ async function register() {
         <input v-model.trim="avatar" id="aligned-avatar" placeholder="Profile avatar" />
       </div>
       <div class="pure-controls">
-        <button type="submit" class="pure-button pure-button-primary">Register</button>
+        <button type="submit" class="button-blue">Register</button>
       </div>
     </fieldset>
   </form>

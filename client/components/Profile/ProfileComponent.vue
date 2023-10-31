@@ -42,15 +42,15 @@ onBeforeMount(async () => {
   <ProfileHeader :username="profileUsername" />
   <AddToUserCollectionForm v-if="!isCurrentUser && adding" :username="profileUsername" @addUserToCollection="adding = false" />
   <section class="addButton">
-    <button class="pure-button-primary pure-button" v-if="!isCurrentUser && !adding" @click="adding = true">Add to Collection</button>
+    <button class="button-yellow" v-if="!isCurrentUser && !adding" @click="adding = true">Add to Collection</button>
   </section>
   <hr />
   <section class="addButton">
-    <button class="pure-button-primary pure-button" v-if="isCurrentUser" @click="toNewPost()">New Post</button>
+    <button class="button-blue" v-if="isCurrentUser" @click="toNewPost()">New Post</button>
   </section>
   <PostListComponent :profileAuthor="profileUsername" />
   <section class="addButton">
-    <button class="pure-button-primary pure-button" v-if="isCurrentUser" @click="toNewCollection()">New Collection</button>
+    <button class="button-blue" v-if="isCurrentUser" @click="toNewCollection()">New Collection</button>
   </section>
   <CollectionListComponent type="post" :owner="profileUsername" />
   <CollectionListComponent type="user" :owner="profileUsername" />

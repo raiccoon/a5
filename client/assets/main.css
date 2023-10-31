@@ -1,16 +1,46 @@
 /* Add some global styles here! */
 
 :root {
-  --red: rgb(208, 67, 12);
+  --red: rgb(242, 96, 95);
+  --red-light: rgb(220, 155, 146);
+  --blue: rgb(162, 209, 222);
+  --blue-light: rgb(191, 226, 235);
+  --yellow: rgb(232, 186, 70);
+  --yellow-light: rgb(244, 220, 123);
   --base-bg: #f1f3f5;
+}
+
+body {
+  font-family: 'Montserrat', 'Helvetica', Arial, sans-serif;
+}
+
+h1 {
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+}
+
+button {
+  padding: .5em 1em;
+  border: none;
+  border-radius: .25em;
 }
 
 button.btn-small {
   font-size: 80%;
 }
 
+button.button-yellow {
+  background: var(--yellow);
+}
+
+button.button-blue {
+  background: var(--blue);
+}
+
+button.button-red {
+  background: var(--red);
+}
+
 button.button-error {
-  color: white;
   background: var(--red);
 }
 

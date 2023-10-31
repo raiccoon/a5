@@ -77,7 +77,7 @@ onBeforeMount(async () => {
       <option disabled value="">Add to collection:</option>
       <option v-for="collection in collections" :key="collection._id" :value="collection._id">{{ collection.label }}</option>
     </select>
-    <button type="submit" class="pure-button-primary pure-button">Create Collection</button>
+    <button type="submit" class="button-blue">Create Collection</button>
   </form>
 </template>
 

@@ -22,7 +22,7 @@ const emit = defineEmits(["getPostsByAuthor", "getPostsByAuthorCollection"]);
     <form v-if="searchBy == 'author'" @submit.prevent="emit('getPostsByAuthor', author)" class="pure-form">
       <fieldset>
         <input id="author" type="text" v-model="author" placeholder="Username" />
-        <button type="submit" class="pure-button pure-button-primary">Search</button>
+        <button type="submit" class="button-yellow">Search</button>
       </fieldset>
     </form>
     <form v-if="searchBy == 'collection'" @submit.prevent="emit('getPostsByAuthorCollection', collection)" class="pure-form">
@@ -31,7 +31,7 @@ const emit = defineEmits(["getPostsByAuthor", "getPostsByAuthorCollection"]);
           <option disabled value="">Select collection:</option>
           <option v-for="collection in props.collections" :key="collection._id" :value="collection._id">{{ collection.label }}</option>
         </select>
-        <button type="submit" class="pure-button pure-button-primary">Search</button>
+        <button type="submit" class="button-yellow">Search</button>
       </fieldset>
     </form>
   </section>

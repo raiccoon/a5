@@ -42,7 +42,7 @@ onBeforeMount(async () => {
     </section>
     <section id="info">
       <p class="user">{{ name }} @{{ props.username }}</p>
-      <button class="pure-button pure-button-primary" @click="viewUser()">View User</button>
+      <button class="button-yellow" @click="viewUser()">View User</button>
     </section>
   </section>
 </template>
